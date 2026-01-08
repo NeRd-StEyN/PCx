@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-card: #111111;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent-safe: #00ff88;
+            --accent-warning: #ffaa00;
+            --accent-danger: #ff3333;
+            --accent-blue: #3377ff;
+            --border: #222222;
+            --sidebar-width: 240px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-safe: #28cd41;
+            --accent-warning: #ff9f0a;
+            --accent-danger: #ff3b30;
+            --accent-blue: #007aff;
+            --border: #d2d2d7;
+        }
+
+        /* Basic Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            padding: 0 24px 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            color: var(--accent-safe);
+            background-color: rgba(0, 255, 136, 0.05);
+            border-right: 3px solid var(--accent-safe);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 0 24px;
+        }
+
+        .theme-toggle {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            margin-bottom: 24px;
+        }
+
+        /* View Content Management */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .view-content {
+            display: none;
+            flex-direction: column;
+            gap: 32px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view-content.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Specific Component Styles */
+        .status-hero {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .shield-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .shield-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid var(--accent-safe);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        .status-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .status-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .btn-scan {
+            background-color: var(--accent-safe);
+            color: black;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-scan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-scan:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-scan:disabled {
+            background-color: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Health Score Gauge */
+        .health-score-container {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 80px;
+            height: 80px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .health-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent-safe);
+        }
+
+        .health-label {
+            font-size: 8px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Toast System */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-safe);
+            color: var(--text-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+            min-width: 250px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .agent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-safe);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            margin-top: 12px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Speedometer Gauge Styles */
+        .gauge-wrapper {
+            position: relative;
+            width: 160px;
+            height: 100px;
+            margin: -20px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-track {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 10;
+            stroke-linecap: round;
+        }
+
+        .gauge-progress {
+            fill: none;
+            stroke: var(--accent-safe);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 110;
+            stroke-dashoffset: 110;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.8s ease;
+        }
+
+        .gauge-value-text {
+            position: absolute;
+            bottom: 12px;
+            font-size: 24px;
+            font-weight: 800;
+            width: 100%;
+            text-align: center;
+        }
+
+        .intel-panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+        }
+
+        .intel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .intel-content {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .intel-rationale {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Protection View Styles */
+        .action-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        /* Settings View Styles */
+        .setting-group {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        /* History View Styles */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            background: var(--bg-card);
+            border-left: 4px solid var(--accent-safe);
+            padding: 16px;
+            border-radius: 4px 12px 12px 4px;
+            margin-bottom: 8px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        /* Markdown Styling */
+        .markdown-content p {
+            margin-bottom: 8px;
+        }
+
+        .markdown-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .markdown-content strong {
+            color: var(--accent-safe);
+            font-weight: 700;
+        }
+
+        /* Toggle Button Group */
+        .toggle-group {
+            display: flex;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .mode-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-safe);
+            color: black;
+        }
+
+        .mode-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .validation-status {
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .validation-status.success {
+            color: var(--accent-safe);
+            display: block;
+        }
+
+        .validation-status.error {
+            color: var(--accent-danger);
+            display: block;
+        }
+
+        .validation-status.loading {
+            color: var(--accent-warning);
+            display: block;
+        }
+
+        /* Modern Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            transition: .3s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-safe);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        /* --- RESPONSIVENESS --- */
+        @media (max-width: 900px) {
+            :root {
+                --sidebar-width: 72px;
+            }
+
+            .logo-text,
+            .nav-text,
+            .theme-text {
+                display: none;
+            }
+
+            .logo-container {
+                justify-content: center;
+                padding: 0 0 32px;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 16px 0;
+            }
+
+            .main-content {
+                padding: 24px;
+            }
+
+            .theme-toggle {
+                padding: 10px 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                padding: 12px 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                position: sticky;
+                top: 0;
+            }
+
+            .logo-container {
+                padding-bottom: 0;
+                margin-right: auto;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                border-right: none !important;
+                border-bottom: 3px solid transparent;
+            }
+
+            .nav-item.active {
+                border-bottom: 3px solid var(--accent-safe);
+            }
+
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .status-hero {
+                padding: 32px 16px;
+            }
+
+            .health-score-container {
+                top: 16px;
+                right: 16px;
+                width: 60px;
+                height: 60px;
+            }
+
+            .health-value {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <img src="app_icon.png" alt="Logo">
+            </div>
+            <div class="logo-text">PCx</div>
+        </div>
+        <div id="nav-dashboard" class="nav-item active" onclick="switchView('dashboard')">🏠 <span
+                class="nav-text">Dashboard</span></div>
+        <div id="nav-protection" class="nav-item" onclick="switchView('protection')">🛡️ <span
+                class="nav-text">Protection</span></div>
+        <div id="nav-settings" class="nav-item" onclick="switchView('settings')">⚙️ <span
+                class="nav-text">Settings</span></div>
+        <div id="nav-history" class="nav-item" onclick="switchView('history')">📋 <span class="nav-text">Activity
+                Log</span></div>
+
+        <div class="sidebar-footer">
+            <button id="theme-btn" class="theme-toggle">
+                <span id="theme-icon">🌙</span> <span class="theme-text">Dark Mode</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard View -->
+        <div id="view-dashboard" class="view-content active">
+            <div class="status-hero">
+                <div class="health-score-container">
+                    <div id="health-val" class="health-value">98</div>
+                    <div class="health-label">Health</div>
+                </div>
+                <div class="shield-ring"></div>
+                <div class="shield-icon">
+                    <svg viewBox="0 0 24 24" fill="var(--accent-safe)" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" />
+                    </svg>
+                </div>
+                <div id="status-text" class="status-title">System Secure</div>
+                <div class="status-subtitle">Advanced background agents are protecting your PC in real-time.</div>
+
+                <div id="agent-status-badge" class="agent-badge">
+                    <span class="pulse-dot"></span>
+                    <span id="agent-status-text">Active Protection</span>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <button id="scan-btn" class="btn-scan">Run Smart Scan</button>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="card" style="align-items: center; text-align: center;">
+                    <div class="card-title">CPU Load</div>
+                    <div class="gauge-wrapper">
+                        <svg viewBox="0 0 100 60" class="gauge-svg">
+                            <path d="M15,50 A35,35 0 0,1 85,50" class="gauge-track" />
+                            <path id="cpu-gauge" d="M15,50 A35,35 0 0,1 85,50" class="gauge-progress" />
+                        </svg>
+                        <div id="cpu-val" class="gauge-value-text">0%</div>
+                    </div>
+                </div>
+                <div class="card" style="align-items: center; text-align: center;">
+                    <div class="card-title">RAM Usage</div>
+                    <div class="gauge-wrapper">
+                        <svg viewBox="0 0 100 60" class="gauge-svg">
+                            <path d="M15,50 A35,35 0 0,1 85,50" class="gauge-track" />
+                            <path id="ram-gauge" d="M15,50 A35,35 0 0,1 85,50" class="gauge-progress" />
+                        </svg>
+                        <div id="ram-val" class="gauge-value-text">0%</div>
+                    </div>
+                </div>
+                <div class="card" style="align-items: center; text-align: center;">
+                    <div class="card-title">Battery</div>
+                    <div class="gauge-wrapper">
+                        <svg viewBox="0 0 100 60" class="gauge-svg">
+                            <path d="M15,50 A35,35 0 0,1 85,50" class="gauge-track" />
+                            <path id="bat-gauge" d="M15,50 A35,35 0 0,1 85,50" class="gauge-progress"
+                                style="stroke: var(--accent-blue)" />
+                        </svg>
+                        <div id="bat-val" class="gauge-value-text">100%</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Status</div>
+                    <div id="power-val" class="card-value" style="font-size: 18px; margin-top: 10px;">Plugged In</div>
+                    <div id="scan-interval-text" style="font-size: 11px; opacity: 0.5;">Scan interval: 2m</div>
+                </div>
+            </div>
+
+            <div class="intel-panel">
+                <div class="intel-header">
+                    <div class="intel-icon">🧠</div>
+                    <div style="font-weight: 700; font-size: 14px;">AGENT ANALYTICS</div>
+                </div>
+                <div id="intel-content" class="intel-content">Initializing security engines...</div>
+                <div id="intel-rationale" class="intel-rationale">Waiting for first scan outcome.</div>
+            </div>
+        </div>
+
+        <!-- Protection View -->
+        <div id="view-protection" class="view-content">
+            <h2 style="font-size: 24px;">🛡️ Protection Actions</h2>
+            <p style="color: var(--text-secondary);">AI-recommended optimizations and active security measures.</p>
+            <div id="active-actions-list">
+                <div class="action-card">
+                    <div>
+                        <div style="font-weight: 600;">Full System Shield</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Real-time monitoring active</div>
+                    </div>
+                    <div style="color: var(--accent-safe);">ACTIVE</div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Manual Boost</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                    <button class="btn-scan" style="font-size: 14px; padding: 10px;" onclick="boostSystem()">Optimize
+                        Memory</button>
+                    <button class="btn-scan" style="font-size: 14px; padding: 10px; background: var(--accent-blue);"
+                        onclick="cleanupTemp()">Clear Junk & Bin</button>
+                    <button class="btn-scan"
+                        style="font-size: 14px; padding: 10px; background: var(--accent-warning); color: black;"
+                        onclick="optimizeDrives()">Optimize Drives</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="view-settings" class="view-content">
+            <h2 style="font-size: 24px;">⚙️ Settings</h2>
+            <div class="setting-group">
+                <h3 style="font-size: 14px; color: var(--accent-safe); margin-bottom: 16px;">GENERAL</h3>
+                <div class="setting-row">
+                    <div>
+                        <div style="font-weight: 600;">Launch on Startup</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Start PCx automatically.</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="startup-toggle" onchange="toggleStartup()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                    <div>
+                        <div style="font-weight: 600;">Groq API Key</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Used for Advanced Context Reasoning.
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <input type="password" id="api-key-input"
+                            style="flex: 1; background: var(--bg-primary); border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px;"
+                            placeholder="Paste your gsk_... key here">
+                        <button id="save-key-btn" class="btn-scan" style="padding: 8px 16px; font-size: 12px;"
+                            onclick="saveApiKey()">Save & Validate</button>
+                    </div>
+                    <div id="key-validation-status" class="validation-status"></div>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div style="font-weight: 600;">Reasoning Engine</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Choose between Hybrid Cloud AI or
+                            Local-only rules.</div>
+                    </div>
+                    <div class="toggle-group">
+                        <button id="mode-llm" class="mode-btn" onclick="setReasoningMode('llm')">Cloud AI</button>
+                        <button id="mode-local" class="mode-btn" onclick="setReasoningMode('local')">Local Only</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="view-history" class="view-content">
+            <h2 style="font-size: 24px;">📋 Activity Log</h2>
+            <div id="history-list-view" class="history-list">
+                <div style="text-align: center; color: var(--text-secondary); margin-top: 40px;">No events recorded
+                    recently.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        // Theme
+        const themeBtn = document.getElementById('theme-btn');
+        let currentTheme = 'dark';
+        themeBtn.onclick = () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', currentTheme);
+            document.getElementById('theme-icon').innerText = currentTheme === 'dark' ? '🌙' : '☀️';
+            themeBtn.innerText = currentTheme === 'dark' ? '🌙Dark Mode' : '☀️Light Mode';
+        };
+
+        function updateGauge(id, value, isBattery = false) {
+            const gauge = document.getElementById(id);
+            if (!gauge) return;
+            const length = 110; // Dasharray length for the arc
+            const offset = length - (length * value / 100);
+            gauge.style.strokeDashoffset = offset;
+
+            if (isBattery) {
+                gauge.style.stroke = value > 25 ? 'var(--accent-blue)' : 'var(--accent-danger)';
+            } else {
+                if (value < 50) gauge.style.stroke = 'var(--accent-safe)';
+                else if (value < 80) gauge.style.stroke = 'var(--accent-warning)';
+                else gauge.style.stroke = 'var(--accent-danger)';
+            }
+        }
+
+        // Navigation
+        function switchView(viewId) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById('nav-' + viewId).classList.add('active');
+            document.querySelectorAll('.view-content').forEach(view => view.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+        }
+
+        // Local state for scan
+        function startScanUI() {
+            const statusText = document.getElementById('status-text');
+            const scanBtn = document.getElementById('scan-btn');
+
+            if (statusText) {
+                statusText.innerText = 'Scanning...';
+                statusText.style.color = 'var(--accent-warning)';
+            }
+
+            if (scanBtn) {
+                scanBtn.disabled = true;
+                scanBtn.innerText = 'Scan Requested...';
+            }
+
+            document.getElementById('intel-content').innerHTML = "<em>Initializing sensors...</em>";
+            document.getElementById('intel-rationale').innerHTML = "<em>Gathering system state...</em>";
+        }
+
+        function finishScanUI() {
+            const scanBtn = document.getElementById('scan-btn');
+            if (scanBtn) {
+                scanBtn.disabled = false;
+                scanBtn.innerText = 'Run Smart Scan';
+            }
+        }
+
+        // Bridge Actions
+        function setupEventListeners() {
+            const scanBtn = document.getElementById('scan-btn');
+            if (scanBtn) {
+                scanBtn.onclick = async () => {
+                    startScanUI();
+                    if (window.pywebview && window.pywebview.api) {
+                        try {
+                            await window.pywebview.api.run_scan();
+
+                            // Poll for status to finish UI
+                            let pollCount = 0;
+                            const pollInterval = setInterval(async () => {
+                                pollCount++;
+                                const status = await window.pywebview.api.get_agent_status();
+                                if (status === "Intelligence Updated" || status === "Active Protection" || pollCount > 30) {
+                                    clearInterval(pollInterval);
+                                    finishScanUI();
+                                }
+                            }, 1000);
+                        } catch (e) {
+                            console.error("Scan error:", e);
+                            finishScanUI();
+                        }
+                    } else {
+                        finishScanUI();
+                    }
+                };
+            }
+        }
+
+        async function boostSystem() {
+            const btn = event.target;
+            btn.innerText = "Optimizing...";
+            const success = await window.pywebview.api.flush_memory();
+            setTimeout(() => { btn.innerText = "Optimize Memory"; if (success) alert("Memory flushed!"); }, 1000);
+        }
+
+        async function cleanupTemp() {
+            const btn = event.target;
+            btn.innerText = "Cleaning...";
+            const success = await window.pywebview.api.clear_junk();
+            setTimeout(() => { btn.innerText = "Clear Junk & Bin"; if (success) alert("Junk and Recycle Bin cleared!"); }, 1000);
+        }
+
+        async function optimizeDrives() {
+            const btn = event.target;
+            btn.innerText = "Optimizing...";
+            const success = await window.pywebview.api.run_drive_optimization();
+            setTimeout(() => { btn.innerText = "Optimize Drives"; if (success) alert("All drives optimized successfully!"); }, 1000);
+        }
+
+
+        async function toggleStartup() {
+            const checkbox = document.getElementById('startup-toggle');
+            const success = await window.pywebview.api.toggle_startup(checkbox.checked);
+            if (!success) { alert("Failed to update startup."); checkbox.checked = !checkbox.checked; }
+        }
+
+        async function saveApiKey() {
+            const input = document.getElementById('api-key-input');
+            const statusDiv = document.getElementById('key-validation-status');
+            const saveBtn = document.getElementById('save-key-btn');
+            const cloudBtn = document.getElementById('mode-llm');
+
+            if (!input.value) {
+                alert("Please enter an API key.");
+                return;
+            }
+
+            statusDiv.className = "validation-status loading";
+            statusDiv.innerText = "⌛ Validating key...";
+            saveBtn.disabled = true;
+
+            try {
+                const response = await window.pywebview.api.set_api_key(input.value);
+                if (response.success) {
+                    statusDiv.className = "validation-status success";
+                    statusDiv.innerText = "✅ " + response.message;
+                    showToast("🔑 Key Validated", response.message);
+                    cloudBtn.disabled = false;
+                } else {
+                    statusDiv.className = "validation-status error";
+                    statusDiv.innerText = "❌ " + response.message;
+                    showToast("⚠️ Validation Failed", response.message);
+
+                    // Disable Cloud AI and switch to local if invalid
+                    cloudBtn.disabled = true;
+                    await setReasoningMode('local');
+                }
+            } catch (e) {
+                statusDiv.className = "validation-status error";
+                statusDiv.innerText = "❌ Error connecting to validation service.";
+            } finally {
+                saveBtn.disabled = false;
+            }
+        }
+
+        async function setReasoningMode(mode) {
+            const success = await window.pywebview.api.set_preference('reasoning_mode', mode);
+            if (success) {
+                updateModeUI(mode);
+                showToast("🧠 Engine Switched", `Now using ${mode === 'llm' ? 'Cloud AI Reasoning' : 'Local Heuristics'}.`);
+            }
+        }
+
+        function updateModeUI(mode) {
+            const isCloudDisabled = document.getElementById('mode-llm').disabled;
+            const finalMode = isCloudDisabled ? 'local' : mode;
+
+            document.getElementById('mode-llm').classList.toggle('active', finalMode === 'llm');
+            document.getElementById('mode-local').classList.toggle('active', finalMode === 'local');
+        }
+
+        async function initSettings() {
+            if (window.pywebview && window.pywebview.api) {
+                const isEnabled = await window.pywebview.api.get_startup_status();
+                document.getElementById('startup-toggle').checked = isEnabled;
+
+                const key = await window.pywebview.api.get_api_key();
+                document.getElementById('api-key-input').value = key;
+
+                let isKeyValid = false;
+                if (key) {
+                    const statusDiv = document.getElementById('key-validation-status');
+                    statusDiv.className = "validation-status loading";
+                    statusDiv.innerText = "⌛ Verifying API Key...";
+
+                    isKeyValid = await window.pywebview.api.check_api_key();
+
+                    if (isKeyValid) {
+                        statusDiv.className = "validation-status success";
+                        statusDiv.innerText = "✅ API Key is valid and active.";
+                    } else {
+                        statusDiv.className = "validation-status error";
+                        statusDiv.innerText = "❌ Saved API Key is invalid or expired.";
+                    }
+                } else {
+                    document.getElementById('key-validation-status').innerText = "";
+                }
+
+                // Enable/Disable Cloud AI based on key validity
+                document.getElementById('mode-llm').disabled = !isKeyValid;
+
+                const prefs = await window.pywebview.api.get_preferences();
+                // If cloud is disabled but preference was llm, automatically switch to local
+                let currentMode = prefs.reasoning_mode || 'llm';
+                if (!isKeyValid && currentMode === 'llm') {
+                    currentMode = 'local';
+                    await window.pywebview.api.set_preference('reasoning_mode', 'local');
+                }
+
+                updateModeUI(currentMode);
+            }
+        }
+
+        async function initApp() {
+            if (window.pywebview && window.pywebview.api) {
+                if (!window.hasInitialized) {
+                    await initSettings();
+                    setupEventListeners();
+                    window.hasInitialized = true;
+                    showToast("🛡️ PCx Shield Activated", "background monitoring started.");
+                }
+            }
+        }
+
+        function showToast(title, message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div style="font-size: 20px;">ℹ️</div>
+                <div>
+                    <div style="font-weight: 700; font-size: 13px;">${title}</div>
+                    <div style="font-size: 11px; opacity: 0.7;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = '0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        let lastHistoryCount = 0;
+
+        // Main Loop
+        async function updateMetrics() {
+            if (!window.pywebview || !window.pywebview.api) {
+                setTimeout(updateMetrics, 1000); return;
+            }
+
+            await initApp();
+
+            try {
+                // Fetch stats from bridge
+                const metrics = await window.pywebview.api.get_metrics();
+                const health = await window.pywebview.api.get_health_score();
+                const agentStatus = await window.pywebview.api.get_agent_status();
+
+                // Update Health & Status
+                const healthEl = document.getElementById('health-val');
+                if (healthEl) {
+                    healthEl.innerText = health;
+                    healthEl.style.color = health > 80 ? 'var(--accent-safe)' : (health > 50 ? 'var(--accent-warning)' : 'var(--accent-danger)');
+                }
+
+                const statusEl = document.getElementById('agent-status-text');
+                if (statusEl) statusEl.innerText = agentStatus;
+
+                const history = await window.pywebview.api.get_history();
+                const lastHistoryCount = window.lastHistoryCount || 0;
+
+                if (metrics) {
+                    const cpu = Math.round(metrics.cpu_usage_percent);
+                    const ram = Math.round(metrics.memory_usage_percent);
+                    const bat = Math.round(metrics.battery_percent);
+
+                    document.getElementById('cpu-val').innerText = cpu + '%';
+                    updateGauge('cpu-gauge', cpu);
+
+                    document.getElementById('ram-val').innerText = ram + '%';
+                    updateGauge('ram-gauge', ram);
+
+                    document.getElementById('bat-val').innerText = bat + '%';
+                    updateGauge('bat-gauge', bat, true);
+
+                    document.getElementById('power-val').innerText = metrics.is_plugged ? 'Plugged In' : 'On Battery';
+
+                    // Update dynamic scan interval display
+                    const prefs = await window.pywebview.api.get_preferences();
+                    const intervalEl = document.getElementById('scan-interval-text');
+                    const lastTime = (history && history.length > 0) ? history[history.length - 1].timestamp : "--:--:--";
+                    if (intervalEl) {
+                        if (prefs.reasoning_mode === 'llm') {
+                            intervalEl.innerText = `Scan: 2m (L) / 15m (AI) • Last: ${lastTime}`;
+                        } else {
+                            intervalEl.innerText = `Scan: 2m (Local Only) • Last: ${lastTime}`;
+                        }
+                    }
+                }
+
+                if (history && history.length > 0) {
+                    // Toast if new actions taken
+                    if (history.length > lastHistoryCount) {
+                        const latest = history[history.length - 1];
+                        if (latest.actions && latest.actions.length > 0) {
+                            showToast("🚀 Optimization Applied", latest.actions[0].description);
+                        }
+                        window.lastHistoryCount = history.length;
+                    }
+
+                    const latest = history[history.length - 1];
+
+                    // Render Markdown - Only if not currently in a heavy Reasoning state
+                    if (agentStatus.includes("Reasoning")) {
+                        document.getElementById('intel-content').innerHTML = `<em>🧠 AI Intelligence is analyzing your system context...</em>`;
+                        document.getElementById('intel-rationale').innerHTML = `<em>Deep reasoning agent is processing metrics...</em>`;
+                    } else {
+                        document.getElementById('intel-content').innerHTML = `<div class="markdown-content">${marked.parse(latest.context)}</div>`;
+                        document.getElementById('intel-rationale').innerHTML = `<div class="markdown-content">${marked.parse(latest.decision.rationale)}</div>`;
+                    }
+
+                    const latestEntry = history[history.length - 1];
+                    const hasActiveActions = latestEntry.actions && latestEntry.actions.some(a => a.description);
+
+                    if (hasActiveActions) { window.lastActionTime = Date.now(); }
+                    const secondsSinceAction = (Date.now() - (window.lastActionTime || 0)) / 1000;
+
+                    const isOptimizing = secondsSinceAction < 10;
+                    const isReasoning = agentStatus.includes("Reasoning") || agentStatus === "Cloud Reasoning...";
+
+                    document.getElementById('status-text').innerText = isOptimizing ? 'Optimizing...' : (isReasoning ? 'Analyzing...' : 'System Secure');
+                    document.getElementById('status-text').style.color = (isOptimizing || isReasoning) ? 'var(--accent-warning)' : 'var(--accent-safe)';
+
+                    // Disable/Enable scan button based on activity
+                    const scanBtn = document.getElementById('scan-btn');
+                    if (scanBtn) {
+                        if (isOptimizing || isReasoning) {
+                            scanBtn.disabled = true;
+                            scanBtn.innerText = isOptimizing ? 'Optimizing...' : 'Scanning...';
+                        } else {
+                            // Only re-enable if it's not already in "Scan Requested" state from startScanUI
+                            if (scanBtn.innerText !== 'Scan Requested...') {
+                                scanBtn.disabled = false;
+                                scanBtn.innerText = 'Run Smart Scan';
+                            }
+                        }
+                    }
+
+                    // History Pop - Deduplicated
+                    const uniqueHistory = [];
+                    for (let i = 0; i < history.length; i++) {
+                        if (i > 0 &&
+                            history[i].context === history[i - 1].context &&
+                            history[i].decision.rationale === history[i - 1].decision.rationale &&
+                            (history[i].actions || []).length === (history[i - 1].actions || []).length) {
+                            // If it's a "silent" duplicate, skip adding to UI list
+                            continue;
+                        }
+                        uniqueHistory.push(history[i]);
+                    }
+
+                    const historyHtml = uniqueHistory.slice(-10).reverse().map(h => `
+                        <div class="history-item" style="border-left-color: ${h.decision.status === 'ACT' ? 'var(--accent-warning)' : 'var(--accent-safe)'}">
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; opacity: 0.6; margin-bottom: 4px;">
+                                <span>${h.timestamp}</span>
+                                <span>CPU: ${Math.round(h.metrics.cpu_usage_percent)}%</span>
+                            </div>
+                            <div style="font-weight: 600; font-size: 13px;" class="markdown-content">${marked.parse(h.context)}</div>
+                            <div style="font-size: 11px; font-style: italic; opacity: 0.8;" class="markdown-content">${marked.parse(h.decision.rationale)}</div>
+                        </div>
+                    `).join('');
+                    document.getElementById('history-list-view').innerHTML = historyHtml;
+
+                    // Actions Feed - Only update UI if new actions are detected
+                    const allActions = history.filter(h => h.actions && h.actions.length > 0)
+                        .flatMap(h => h.actions);
+
+                    if (allActions.length !== window.lastTotalActions) {
+                        window.lastTotalActions = allActions.length;
+                        const recentActions = allActions.slice(-6).reverse();
+
+                        if (recentActions.length > 0) {
+                            const actionsHtml = recentActions.map(a => `
+                                <div class="action-card">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 13px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px;">${a.action.replace(/_/g, ' ')}</div>
+                                        <div style="font-size: 11px; opacity: 0.7; margin-top: 4px; line-height: 1.4;">${a.description}</div>
+                                    </div>
+                                    <div style="color: var(--accent-safe); font-size: 11px; font-weight: 800; opacity: 0.6;">OK</div>
+                                </div>
+                            `).join('');
+                            document.getElementById('active-actions-list').innerHTML = actionsHtml;
+                        }
+                    }
+                }
+            } catch (e) { console.error(e); }
+            setTimeout(updateMetrics, 1000);
+        }
+
+        window.addEventListener('pywebviewready', updateMetrics);
+        setTimeout(updateMetrics, 2000);
+    </script>
+</body>
+
+</html>

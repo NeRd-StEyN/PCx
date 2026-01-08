@@ -1,0 +1,10 @@
+psutil
+pywebview
+langchain
+langchain-groq
+python-dotenv
+pystray
+Pillow
+marked
+# Optional for bundling
+pyinstaller
