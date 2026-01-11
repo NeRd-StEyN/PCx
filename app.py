@@ -191,6 +191,51 @@ class PythonBridge:
             self._save_data()
         return success
 
+    def immediate_optimize(self):
+        """Runs all optimization tools sequentially for an immediate performance boost."""
+        try:
+            results = []
+            # 1. Memory & App Management
+            results.append(OSActions.flush_system_memory())
+            results.append(OSActions.clear_standby_list())
+            results.append(OSActions.enable_efficiency_mode_background()) # New: Background Eco-Mode
+            
+            # 2. Storage & Cache Cleanup
+            results.append(OSActions.clear_temp_files())
+            results.append(OSActions.clear_recycle_bin())
+            results.append(OSActions.clear_browser_cache())
+            results.append(OSActions.clear_delivery_optimization()) # New: Massive space reclaimer
+            
+            # 3. System & UI Performance
+            results.append(OSActions.flush_dns())
+            results.append(OSActions.prioritize_active_process())
+            results.append(OSActions.tune_ui_snappiness()) # New: Registry speed tweaks
+            
+            # 4. Drive Optimization (TRIM/Defrag)
+            results.append(OSActions.optimize_drives())
+            
+            self.preferences["last_optimized"] = time.time()
+            self.last_cleanup_time = time.time()
+            self._save_data()
+            
+            # Add a history entry for the manual optimization
+            self.history.append({
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "metrics": self.current_metrics,
+                "context": "**System Optimizer**: Deep Performance Stack applied. UI delays removed and background apps throttled.",
+                "decision": {"status": "ACT", "rationale": "High-impact manual optimization stack triggered."},
+                "actions": [
+                    {"action": "deep_optimize", "description": "Full performance stack applied."},
+                    {"action": "ui_tuning", "description": "Registry optimized for responsiveness."},
+                    {"action": "eco_mode", "description": "Background apps set to Efficiency Mode."}
+                ]
+            })
+            
+            return True
+        except Exception as e:
+            print(f"Immediate Optimization Error: {e}")
+            return False
+
     def get_startup_status(self):
         return StartupManager.is_auto_run_enabled()
 

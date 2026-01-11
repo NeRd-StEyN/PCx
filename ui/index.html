@@ -258,6 +258,19 @@
             box-shadow: none;
         }
 
+        .btn-optimize {
+            background-color: var(--accent-blue) !important;
+            box-shadow: 0 4px 12px rgba(51, 119, 255, 0.2);
+        }
+
+        .btn-optimize:hover {
+            box-shadow: 0 8px 24px rgba(51, 119, 255, 0.4);
+        }
+
+        .btn-optimize:active {
+            box-shadow: 0 2px 8px rgba(51, 119, 255, 0.3);
+        }
+
         /* Health Score Gauge */
         .health-score-container {
             position: absolute;
@@ -747,8 +760,9 @@
                     <span id="agent-status-text">Active Protection</span>
                 </div>
 
-                <div style="margin-top: 24px;">
+                <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
                     <button id="scan-btn" class="btn-scan">Run Smart Scan</button>
+                    <button id="optimize-btn" class="btn-scan btn-optimize">Immediate Optimize</button>
                 </div>
             </div>
 
@@ -974,6 +988,28 @@
                     } else {
                         finishScanUI();
                     }
+                };
+            }
+
+            const optimizeBtn = document.getElementById('optimize-btn');
+            if (optimizeBtn) {
+                optimizeBtn.onclick = async () => {
+                    optimizeBtn.disabled = true;
+                    optimizeBtn.innerText = 'Optimizing...';
+                    if (window.pywebview && window.pywebview.api) {
+                        try {
+                            const success = await window.pywebview.api.immediate_optimize();
+                            if (success) {
+                                showToast("🚀 PC Optimized", "All performance stacks applied.");
+                            }
+                        } catch (e) {
+                            console.error("Optimization error:", e);
+                        }
+                    }
+                    setTimeout(() => {
+                        optimizeBtn.disabled = false;
+                        optimizeBtn.innerText = 'Immediate Optimize';
+                    }, 2000);
                 };
             }
         }

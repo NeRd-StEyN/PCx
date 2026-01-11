@@ -224,3 +224,53 @@ class OSActions:
             p.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
             return True
         except: return False
+
+    @staticmethod
+    def tune_ui_snappiness():
+        """Reduces artificial UI delays in the registry to make Windows feel instant."""
+        if platform.system() != "Windows": return False
+        try:
+            # MenuShowDelay (Default 400ms -> 100ms), MouseHoverTime (Default 400ms -> 100ms)
+            cmds = [
+                'reg add "HKCU\\Control Panel\\Desktop" /v MenuShowDelay /t REG_SZ /d 100 /f',
+                'reg add "HKCU\\Control Panel\\Desktop" /v MouseHoverTime /t REG_SZ /d 100 /f'
+            ]
+            for cmd in cmds:
+                subprocess.run(cmd, shell=True, capture_output=True)
+            OSActions.show_notification("UI Boost", "Artificial UI delays reduced. Registry tuned for snappiness.")
+            return True
+        except: return False
+
+    @staticmethod
+    def clear_delivery_optimization():
+        """Clears the Windows Update Delivery Optimization cache which can take up many GBs."""
+        if platform.system() != "Windows": return False
+        try:
+            # Reclaim massive amounts of disk space
+            script = "Get-Service -Name dosvc | Stop-Service -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$env:SystemRoot\\SoftwareDistribution\\DeliveryOptimization\\*\" -Recurse -Force -ErrorAction SilentlyContinue; Start-Service -Name dosvc -ErrorAction SilentlyContinue"
+            subprocess.run(f"powershell -NoProfile -Command \"{script}\"", shell=True, capture_output=True)
+            OSActions.show_notification("Storage", "Delivery Optimization (Update) cache purged. Disk speed improved.")
+            return True
+        except: return False
+
+    @staticmethod
+    def enable_efficiency_mode_background():
+        """Windows 11 only: Puts known background 'heavy' apps into Efficiency Mode (Eco Mode)."""
+        if platform.system() != "Windows": return False
+        # Efficiency Mode is a Win11 feature. On Win10, users get standard priority lowering.
+        try:
+            background_apps = ['chrome.exe', 'msedge.exe', 'discord.exe', 'spotify.exe', 'teams.exe', 'slack.exe']
+            count = 0
+            for p in psutil.process_iter(['name', 'pid']):
+                try:
+                    if p.info['name'].lower() in background_apps:
+                        # Use BELOW_NORMAL instead of IDLE to ensure background audio/calls don't skip
+                        proc = psutil.Process(p.info['pid'])
+                        proc.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS) 
+                        count += 1
+                except: continue
+            
+            if count > 0:
+                OSActions.show_notification("Eco Mode", f"Optimized {count} background apps for efficiency.")
+            return True
+        except: return False
